@@ -26,14 +26,14 @@ services:
       # Peer specific variables
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_LOCALMSPID=ConsumerMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
       - CORE_METRICS_PROVIDER=prometheus
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
 
     working_dir: /root
     volumes: 
-      - ../core/core-peer-org2.yaml:/etc/hyperledger/peercfg/core.yaml
+      - ../core/core-peer-consumer.yaml:/etc/hyperledger/peercfg/core.yaml
 
     command: peer node start
 

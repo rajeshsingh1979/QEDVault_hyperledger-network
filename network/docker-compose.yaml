@@ -1,135 +1,172 @@
 version: "3.7"
 
 volumes:
-  orderer.example.com:
-  peer0.org1.example.com:
-  peer0.org2.example.com:
+  orderer.qedvault.com:
+  peer0.admin.qedvault.com:
+  peer0.manufacturer.qedvault.com:
 
 
 networks:
-  test:
-    name: fabric_test
+  dev:
+    name: qedvault
 
 services:
-  ca.org1.example.com:
+  ca.admin.qedvault.com:
     image: hyperledger/fabric-ca:latest
-    container_name: ca.org1.example.com
+    container_name: ca.admin.qedvault.com
     labels:
       service: hyperledger-fabric
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca.org1.example.com
+      - FABRIC_CA_SERVER_CA_NAME=ca.admin.qedvault.com
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_PORT=7054
-      - FABRIC_CA_SERVER_CA_CERTFILE=/myfiles/organization/ca/ca.org1.example.com-cert.pem
+      - FABRIC_CA_SERVER_CA_CERTFILE=/myfiles/organization/ca/ca.admin.qedvault.com-cert.pem
       - FABRIC_CA_SERVER_CA_KEYFILE=/myfiles/organization/ca/priv_sk
-      - FABRIC_CA_SERVER_TLS_CERTFILE=/myfiles/organization/peers/peer0.org1.example.com/tls/server.crt
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/myfiles/organization/peers/peer0.org1.example.com/tls/server.key
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/myfiles/organization/peers/peer0.admin.qedvault.com/tls/server.crt
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/myfiles/organization/peers/peer0.admin.qedvault.com/tls/server.key
     ports:
       - "7054:7054"
       - "17054:17054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
-      - ../organizations/fabric-ca/org1:/etc/hyperledger/fabric-ca-server
-      - ../organizations/peerOrganizations/org1.example.com:/myfiles/organization
+      - ../organizations/fabric-ca/admin:/etc/hyperledger/fabric-ca-server
+      - ../organizations/peerOrganizations/admin.qedvault.com:/myfiles/organization
     networks:
-      - test
+      - dev
 
 
-  orderer.example.com:
+  admin.orderer.qedvault.com:
     extends:
       file: ./docker-compose/compose-orderer.yaml
-      service: orderer.example.com
-    container_name: orderer.example.com
+      service: orderer-container
+    container_name: admin.orderer.qedvault.com
     environment:
-      - ORDERER_OPERATIONS_LISTENADDRESS=orderer.example.com:9443
+      - ORDERER_OPERATIONS_LISTENADDRESS=admin.orderer.qedvault.com:9443
     volumes:
-        - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
-        - ../organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls/:/var/hyperledger/orderer/tls
-        - ./.data/orderer.example.com:/var/hyperledger/production/orderer
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/admin.orderer.qedvault.com/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/admin.orderer.qedvault.com/tls/:/var/hyperledger/orderer/tls
+        - ./.data/admin.orderer.qedvault.com:/var/hyperledger/production/orderer
     ports:
-      - 7050:7050
-      - 7053:7053
-      - 9443:9443
+      - 6050:7050
+      - 6053:7053
+      - 6043:9443
     networks:
-      - test
-  
-  peer0.org1.example.com:
+      - dev
+      
+  manufacturer.orderer.qedvault.com:
     extends:
-      file: ./docker-compose/compose-org1.yaml
+      file: ./docker-compose/compose-orderer.yaml
+      service: orderer-container
+    container_name: manufacturer.orderer.qedvault.com
+    environment:
+      - ORDERER_OPERATIONS_LISTENADDRESS=manufacturer.orderer.qedvault.com:9443
+    volumes:
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/manufacturer.orderer.qedvault.com/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/manufacturer.orderer.qedvault.com/tls/:/var/hyperledger/orderer/tls
+        - ./.data/manufacturer.orderer.qedvault.com:/var/hyperledger/production/orderer
+    ports:
+      - 6150:7050
+      - 6153:7053
+      - 6143:9443
+    networks:
+      - dev
+
+  consumer.orderer.qedvault.com:
+    extends:
+      file: ./docker-compose/compose-orderer.yaml
+      service: orderer-container
+    container_name: consumer.orderer.qedvault.com
+    environment:
+      - ORDERER_OPERATIONS_LISTENADDRESS=consumer.orderer.qedvault.com:9443
+    volumes:
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/consumer.orderer.qedvault.com/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/orderer.qedvault.com/orderers/consumer.orderer.qedvault.com/tls/:/var/hyperledger/orderer/tls
+        - ./.data/consumer.orderer.qedvault.com:/var/hyperledger/production/orderer
+    ports:
+      - 6250:7050
+      - 6253:7053
+      - 6243:9443
+    networks:
+      - dev
+  
+  peer0.admin.qedvault.com:
+    extends:
+      file: ./docker-compose/compose-org-admin.yaml
       service: peer-container
 
-    container_name: peer0.org1.example.com
+    container_name: peer0.admin.qedvault.com
     environment:
-      - CORE_PEER_ID=peer0.org1.example.com
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.org1.example.com:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
-      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org1"}
-      - CORE_OPERATIONS_LISTENADDRESS=peer0.org1.example.com:9444
+      - CORE_PEER_ID=peer0.admin.qedvault.com
+      - CORE_PEER_ADDRESS=peer0.admin.qedvault.com:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.admin.qedvault.com:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.admin.qedvault.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.admin.qedvault.com:7051
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0admin"}
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.admin.qedvault.com:9444
       
     volumes:
-        - ../organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com:/etc/hyperledger/fabric
-        - ./.data/peer0.org1.example.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/admin.qedvault.com/peers/peer0.admin.qedvault.com:/etc/hyperledger/fabric
+        - ./.data/peer0.admin.qedvault.com:/var/hyperledger/production
         - ../chaincodes/src:/opt/gopath/my-chaincodes/
     ports:
       - 7051:7051
-      - 7444:9444
+      - 7044:9444
     networks:
-      - test
+      - dev
   
-  peer1.org1.example.com:
-    extends:
-      file: ./docker-compose/compose-org1.yaml
-      service: peer-container
-
-    container_name: peer1.org1.example.com
-    environment:
-      - CORE_PEER_ID=peer1.org1.example.com
-      - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer1.org1.example.com:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
-      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1org1"}
-      - CORE_OPERATIONS_LISTENADDRESS=peer1.org1.example.com:9444
-
-    volumes:
-        - ../organizations/peerOrganizations/org1.example.com/peers/peer1.org1.example.com:/etc/hyperledger/fabric
-        - ./.data/peer1.org1.example.com:/var/hyperledger/production
-        - ../chaincodes/src:/opt/gopath/my-chaincodes/
-    ports:
-      - 9051:7051
-      - 9444:9444
-    networks:
-      - test
   
 
 
-  peer0.org2.example.com:
+  peer0.manufacturer.qedvault.com:
     extends:
-      file: ./docker-compose/compose-org2.yaml
+      file: ./docker-compose/compose-org-manufacturer.yaml
       service: peer-container
 
-    container_name: peer0.org2.example.com
+    container_name: peer0.manufacturer.qedvault.com
     environment:
-      - CORE_PEER_ID=peer0.org2.example.com
-      - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.example.com:7052
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.example.com:7051
-      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org2"}
-      - CORE_OPERATIONS_LISTENADDRESS=peer0.org2.example.com:9444
+      - CORE_PEER_ID=peer0.manufacturer.qedvault.com
+      - CORE_PEER_ADDRESS=peer0.manufacturer.qedvault.com:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.manufacturer.qedvault.com:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.manufacturer.qedvault.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.manufacturer.qedvault.com:7051
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0manufacturer"}
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.manufacturer.qedvault.com:9444
 
     volumes:
-        - ../organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com:/etc/hyperledger/fabric
-        - ./.data/peer0.org2.example.com:/var/hyperledger/production
+        - ../organizations/peerOrganizations/manufacturer.qedvault.com/peers/peer0.manufacturer.qedvault.com:/etc/hyperledger/fabric
+        - ./.data/peer0.manufacturer.qedvault.com:/var/hyperledger/production
         - ../chaincodes/src:/opt/gopath/my-chaincodes/
     ports:
       - 8051:7051
-      - 8444:9444
+      - 8044:9444
     networks:
-      - test
+      - dev
+  
+  peer0.consumer.qedvault.com:
+    extends:
+      file: ./docker-compose/compose-org-consumer.yaml
+      service: peer-container
+
+    container_name: peer0.consumer.qedvault.com
+    environment:
+      - CORE_PEER_ID=peer0.consumer.qedvault.com
+      - CORE_PEER_ADDRESS=peer0.consumer.qedvault.com:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.consumer.qedvault.com:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.consumer.qedvault.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.consumer.qedvault.com:7051
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0consumer"}
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.consumer.qedvault.com:9444
+
+    volumes:
+        - ../organizations/peerOrganizations/consumer.qedvault.com/peers/peer0.consumer.qedvault.com:/etc/hyperledger/fabric
+        - ./.data/peer0.consumer.qedvault.com:/var/hyperledger/production
+        - ../chaincodes/src:/opt/gopath/my-chaincodes/
+    ports:
+      - 9051:7051
+      - 9044:9444
+    networks:
+      - dev
 
   cli:
     container_name: cli
@@ -151,13 +188,15 @@ services:
         - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
         - ../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
         - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
-        - ./core/core-peer-org1.yaml:/etc/hyperledger/peercfg/core.yaml
-        - ../config/configtx/configtx1.yaml:/etc/hyperledger/peercfg/configtx.yaml
-        # - ./core/core-peer-org2.yaml:/etc/hyperledger/peercfg/org2/core.yaml
+        - ./automate:/opt/gopath/src/github.com/hyperledger/fabric/peer/automate/
+        - ./core/core-peer-admin.yaml:/etc/hyperledger/peercfg/core.yaml
+        - ../config/configtx/configtx.yaml:/etc/hyperledger/peercfg/configtx.yaml
+        # - ./core/core-peer-manufacturer.yaml:/etc/hyperledger/peercfg/manufacturer/core.yaml
     depends_on:
-      - peer0.org1.example.com
-      - peer0.org2.example.com
+      - peer0.admin.qedvault.com
+      - peer0.manufacturer.qedvault.com
+      - peer0.consumer.qedvault.com
     networks:
-      - test
+      - dev
 
 

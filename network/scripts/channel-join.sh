@@ -3,5 +3,5 @@
 
 BLOCKFILE=./channel-artifacts/$CHANNEL_ID.block
 set -x
-peer channel join -o orderer.example.com:7053 --cafile $ORDERER_CA -b  $BLOCKFILE
+peer channel join -o $ORDERER_ADDRESS --cafile $ORDERER_CA -b  $BLOCKFILE
 set +x

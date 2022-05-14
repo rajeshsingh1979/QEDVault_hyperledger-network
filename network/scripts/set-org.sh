@@ -16,24 +16,28 @@ PEER=${3:-peer0}
 # Where am I?
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 export CORE_PEER_TLS_ENABLED=true
-export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
-PEER0_ORG1_CA=${PWD}/organizations/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
-PEER0_ORG2_CA=${PWD}/organizations/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem
-PEER0_ORG3_CA=${PWD}/organizations/peerOrganizations/org3.example.com/tlsca/tlsca.org3.example.com-cert.pem
+# export ORDERER_CA=${PWD}/organizations/ordererOrganizations/qedvault.com/tlsca/tlsca.qedvault.com-cert.pem
+PEER0_QEDVault_CA=${PWD}/organizations/peerOrganizations/admin.qedvault.com/tlsca/tlsca.admin.qedvault.com-cert.pem
+PEER0_MANUFACTURER_CA=${PWD}/organizations/peerOrganizations/org2.qedvault.com/tlsca/tlsca.org2.qedvault.com-cert.pem
+PEER0_CONSUMER_CA=${PWD}/organizations/peerOrganizations/org3.qedvault.com/tlsca/tlsca.org3.qedvault.com-cert.pem
 
 
-if [[ ${ORG,,} == "org1" || ${ORG,,} == "digibank" ]]; then
+if [[ ${ORG,,} == "admin"  ]]; then
 
-   export CORE_PEER_LOCALMSPID=Org1MSP
-   export CORE_PEER_MSPCONFIGPATH=${DIR}/organizations/peerOrganizations/org1.example.com/users/${USERID}@org1.example.com/msp
-   export CORE_PEER_TLS_ROOTCERT_FILE=${DIR}/organizations/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
-   export CORE_PEER_ADDRESS=$PEER.org1.example.com:7051
-elif [[ ${ORG,,} == "org2" || ${ORG,,} == "magnetocorp" ]]; then
-
-   export CORE_PEER_LOCALMSPID=Org2MSP
-   export CORE_PEER_MSPCONFIGPATH=${DIR}/organizations/peerOrganizations/org2.example.com/users/${USERID}@org2.example.com/msp
-   export CORE_PEER_TLS_ROOTCERT_FILE=${DIR}/organizations/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem
-   export CORE_PEER_ADDRESS=$PEER.org2.example.com:7051
+   export CORE_PEER_LOCALMSPID=QEDVaultMSP
+   export CORE_PEER_MSPCONFIGPATH=${DIR}/organizations/peerOrganizations/admin.qedvault.com/users/${USERID}@admin.qedvault.com/msp
+   export CORE_PEER_TLS_ROOTCERT_FILE=${DIR}/organizations/peerOrganizations/admin.qedvault.com/tlsca/tlsca.admin.qedvault.com-cert.pem
+   export CORE_PEER_ADDRESS=$PEER.admin.qedvault.com:7051
+elif [[ ${ORG,,} == "manufacturer"  ]]; then
+   export CORE_PEER_LOCALMSPID=ManufacturerMSP
+   export CORE_PEER_MSPCONFIGPATH=${DIR}/organizations/peerOrganizations/manufacturer.qedvault.com/users/${USERID}@manufacturer.qedvault.com/msp
+   export CORE_PEER_TLS_ROOTCERT_FILE=${DIR}/organizations/peerOrganizations/manufacturer.qedvault.com/tlsca/tlsca.manufacturer.qedvault.com-cert.pem
+   export CORE_PEER_ADDRESS=$PEER.manufacturer.qedvault.com:7051
+elif [[ ${ORG,,} == "consumer"  ]]; then
+   export CORE_PEER_LOCALMSPID=ConsumerMSP
+   export CORE_PEER_MSPCONFIGPATH=${DIR}/organizations/peerOrganizations/consumer.qedvault.com/users/${USERID}@consumer.qedvault.com/msp
+   export CORE_PEER_TLS_ROOTCERT_FILE=${DIR}/organizations/peerOrganizations/consumer.qedvault.com/tlsca/tlsca.consumer.qedvault.com-cert.pem
+   export CORE_PEER_ADDRESS=$PEER.consumer.qedvault.com:7051
 
 else
    echo "Unknown \"$ORG\", please choose Org1/Digibank or Org2/Magnetocorp"
@@ -46,9 +50,9 @@ else
 fi
 
 # output the variables that need to be set
-echo "CORE_PEER_TLS_ENABLED=true"
-echo "ORDERER_CA=${ORDERER_CA}"
-echo "CORE_PEER_MSPCONFIGPATH=${CORE_PEER_MSPCONFIGPATH}"
-echo "CORE_PEER_ADDRESS=${CORE_PEER_ADDRESS}"
-echo "CORE_PEER_TLS_ROOTCERT_FILE=${CORE_PEER_TLS_ROOTCERT_FILE}"
-echo "CORE_PEER_LOCALMSPID=${CORE_PEER_LOCALMSPID}"
+# echo "CORE_PEER_TLS_ENABLED=true"
+# echo "ORDERER_CA=${ORDERER_CA}"
+# echo "CORE_PEER_MSPCONFIGPATH=${CORE_PEER_MSPCONFIGPATH}"
+# echo "CORE_PEER_ADDRESS=${CORE_PEER_ADDRESS}"
+# echo "CORE_PEER_TLS_ROOTCERT_FILE=${CORE_PEER_TLS_ROOTCERT_FILE}"
+# echo "CORE_PEER_LOCALMSPID=${CORE_PEER_LOCALMSPID}"
