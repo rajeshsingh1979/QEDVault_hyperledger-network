@@ -15,6 +15,7 @@ services:
       service: hyperledger-fabric
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=qedvault
       - FABRIC_LOGGING_SPEC=INFO
       - GOPATH=/opt/gopath
       #- FABRIC_LOGGING_SPEC=DEBUG
