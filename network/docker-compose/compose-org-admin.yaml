@@ -7,6 +7,19 @@ version: '3.7'
 
 
 services:
+  couchdb:
+    image: couchdb:3.1.1
+    labels:
+      service: hyperledger-fabric
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    
+
   peer-container:
     extends:
       file: ./docker-base.yaml
@@ -32,6 +45,11 @@ services:
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
       - CORE_METRICS_PROVIDER=prometheus
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+      # provide the credentials for ledger to connect to CouchDB.  The username and password must
+      # match the username and password set for the associated CouchDB.
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
 
     working_dir: /root
     volumes: 
